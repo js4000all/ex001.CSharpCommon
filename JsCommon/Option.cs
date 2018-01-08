@@ -70,6 +70,8 @@ namespace JsCommon
     /// <typeparam name="T"></typeparam>
     public abstract class Option<T>
     {
+        internal Option() { }
+
         /// <summary>
         /// 保持する値を変換する。
         /// SomeならwhenSomeを実行して保持する値を変換する。

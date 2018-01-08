@@ -12,14 +12,15 @@ namespace FlowDef
         const string DELIM = ":";
 
         public static NodeKey Parse(string s, string delim = DELIM)
-            => GenKey(s.Split(new string[] { delim }, StringSplitOptions.RemoveEmptyEntries));
+            => By(s.Split(new string[] { delim }, StringSplitOptions.RemoveEmptyEntries));
 
-        public static NodeKey GenKey(string[] ss)
+        public static NodeKey By(string[] ss) => By(ss, ss.Length);
+        static NodeKey By(string[] ss, int len)
         {
             if(ss.Length == 0) { throw new ArgumentException(); }
-            if (ss.Length > 1)
+            if (len > 1)
             {
-                return new NodeKey(GenKey(ss.Take(ss.Length - 1).ToArray()), ss.Last());
+                return new NodeKey(By(ss, len-1), ss[len-1]);
             }
             return new NodeKey(ss[0]);
         }

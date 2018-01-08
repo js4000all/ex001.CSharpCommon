@@ -61,8 +61,8 @@ namespace FlowDef
 
     /// <summary>
     /// 以下の関係図のノード。
-    /// ・親子関係による縦の関係
-    /// ・同一の親を持つノード同士の先行・後続による横の関係
+    /// ・親子による縦の関係
+    /// ・先行・後続による横の関係
     /// </summary>
     public class Node
     {
@@ -99,7 +99,7 @@ namespace FlowDef
         {
             get
             {
-                // 配置位置をずらす規則があったはず。この計算だと上から詰める形になる
+                // TODO: 配置位置をずらす規則があったはず。この計算だと上から詰める形になる
                 var nextFamilyNode = nextNodes.Where(node => node.Parent == Parent);
                 return (nextFamilyNode.Count() == 0) ? 1 : (uint)nextFamilyNode.Select(node => node.FollowTreeHeight).Sum(v => v);
             }

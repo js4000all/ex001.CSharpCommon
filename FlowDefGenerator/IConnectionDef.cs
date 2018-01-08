@@ -59,16 +59,20 @@ namespace FlowDef
         Option<NodeKey> PrevNode { get; }
     }
 
+    /// <summary>
+    /// 以下の関係図のノード。
+    /// ・親子関係による縦の関係
+    /// ・同一の親を持つノード同士の先行・後続による横の関係
+    /// </summary>
     public class Node
     {
         readonly IDictionary<NodeKey, Node> nodeCache;
         readonly List<Node> subNodes = new List<Node>();
+        readonly List<Node> prevNodes = new List<Node>();
+        readonly List<Node> nextNodes = new List<Node>();
         
         public NodeKey Key { get; }
-        public Option<Node> Parent
-        {
-            get => Key.ParentKey.Map(parentKey => nodeCache[parentKey]);
-        }
+        public Option<Node> Parent { get; }
         public IEnumerable<Node> SubNodes
         {
             get => subNodes;
@@ -79,8 +83,27 @@ namespace FlowDef
             Key = key;
             this.nodeCache = nodeCache;
             nodeCache[key] = this;
+            Parent = key.ParentKey
+                .Map(parentKey => nodeCache.Find(parentKey, k => new Node(k, nodeCache)))
+                .Do(parent => parent.subNodes.Add(this));
         }
 
+        public uint Depth
+        {
+            get => (prevNodes.Count() == 0) ? 0 : prevNodes.Select(node => node.Depth).Max() + 1;
+        }
+        /// <summary>
+        /// このノードを先頭とする後続ノードの高さ
+        /// </summary>
+        public uint FollowTreeHeight
+        {
+            get
+            {
+                // 配置位置をずらす規則があったはず。この計算だと上から詰める形になる
+                var nextFamilyNode = nextNodes.Where(node => node.Parent == Parent);
+                return (nextFamilyNode.Count() == 0) ? 1 : (uint)nextFamilyNode.Select(node => node.FollowTreeHeight).Sum(v => v);
+            }
+        }
     }
 
 }
